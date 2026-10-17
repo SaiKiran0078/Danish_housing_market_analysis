@@ -21,3 +21,4 @@ Thumbs.db
 
 # Generated Python analysis outputs (created by analyze_housing.py)
 analysis/outputs/*.csv
+/data/Housing Data.csv

@@ -121,6 +121,14 @@ The report contains five pages with shared filters for year range, region, area,
 | **CSV** | Transaction-level housing data |
 | **Git / GitHub** | Version control and project documentation |
 
+## Dataset
+
+**Source:** [Danish Residential Housing Prices 1992–2024 — Kaggle](https://www.kaggle.com/datasets/martinfrederiksen/danish-residential-housing-prices-1992-2024)
+
+The dataset is not included in this repository because redistribution permission has not been confirmed. Obtain it from the original source and check the applicable terms before use.
+
+The Kaggle page describes approximately 1.5 million transactions in the full dataset and a separate random sample of 100,000 rows. Confirm which version you use before running the analysis.
+
 ## 📁 Repository structure
 
 ```text
@@ -131,7 +139,7 @@ Danish-Housing-Market-Analysis/
 ├── Housing Market Report.SemanticModel/
 │   └── ... model, relationships, expressions and DAX tables
 ├── data/
-│   └── Housing Data.csv
+│   └── README.md  (dataset download and setup instructions)
 ├── screenshots/
 │   ├── 01-market-overview.png
 │   ├── 02-market-trends.png
@@ -157,7 +165,7 @@ Danish-Housing-Market-Analysis/
 
 ### Requirements
 - Windows with a recent version of **Power BI Desktop**.
-- The repository files, including the CSV under `data/`.
+- The housing dataset downloaded separately from the [Kaggle source](https://www.kaggle.com/datasets/martinfrederiksen/danish-residential-housing-prices-1992-2024).
 
 ### Steps
 1. Clone or download this repository and extract it.
@@ -166,7 +174,7 @@ Danish-Housing-Market-Analysis/
 4. Set the `CsvPath` parameter to the full path of the CSV inside your extracted repository, for example:
 
    ```text
-   C:\path\to\Danish-Housing-Market-Analysis\data\Housing Data.csv
+   C:\path\to\your\downloaded\data\Housing Data.csv
    ```
 
 5. Confirm the parameter, select **Close & Apply**, and allow the model to refresh.
