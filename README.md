@@ -138,8 +138,6 @@ Danish-Housing-Market-Analysis/
 │   └── ... report pages, visuals and theme
 ├── Housing Market Report.SemanticModel/
 │   └── ... model, relationships, expressions and DAX tables
-├── data/
-│   └── README.md  (dataset download and setup instructions)
 ├── screenshots/
 │   ├── 01-market-overview.png
 │   ├── 02-market-trends.png
@@ -158,6 +156,7 @@ Danish-Housing-Market-Analysis/
 │   ├── 2_Calculated_Tables.dax
 │   └── 3_Measures.dax
 ├── .gitignore
+├── .gitattributes    # GitHub language-statistics configuration
 └── README.md
 ```
 
