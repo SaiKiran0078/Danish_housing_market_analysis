@@ -1,0 +1,31 @@
+table 'Metric Selector'
+	lineageTag: ae3d7070-ff3e-50ed-9bc8-b094070143cb
+
+	column Metric
+		dataType: string
+		lineageTag: 7d829536-86c8-567e-94c6-aab03790a95c
+		summarizeBy: none
+		sourceColumn: [Metric]
+		sortByColumn: 'Metric Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Metric Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: d76542ad-1ab3-5c89-92fc-5558787bb4a4
+		summarizeBy: none
+		sourceColumn: [Metric Order]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Metric Selector' = calculated
+		mode: import
+		source =
+				DATATABLE (
+				    "Metric", STRING,
+				    "Metric Order", INTEGER,
+				    { { "Sales Value", 1 }, { "Homes Sold", 2 }, { "Average Price", 3 }, { "Price per sqm", 4 } }
+				)
+

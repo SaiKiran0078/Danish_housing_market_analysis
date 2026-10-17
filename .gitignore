@@ -1,0 +1,23 @@
+# Power BI local state and caches
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+**/.pbi/*Settings.json
+**/.pbi/*Cache*
+
+# Power BI Desktop temporary/backup files
+*.tmp
+*.bak
+*.log
+~$*
+*.pbix.autosave
+
+# Python / editor / OS noise
+__pycache__/
+*.py[cod]
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Generated Python analysis outputs (created by analyze_housing.py)
+analysis/outputs/*.csv

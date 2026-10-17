@@ -1,0 +1,125 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.6.0/schema.json",
+  "name": "9ae600db1c493e10d6c7",
+  "position": {
+    "x": 532.55965138890861,
+    "y": 423.25701551432911,
+    "z": 14000,
+    "height": 274.41938368511444,
+    "width": 731.39742516075,
+    "tabOrder": 14000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Housing Data"
+                    }
+                  },
+                  "Property": "Area"
+                }
+              },
+              "queryRef": "Housing Data.Area",
+              "nativeQueryRef": "Area"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Homes Sold"
+                }
+              },
+              "queryRef": "_Measures.Homes Sold",
+              "nativeQueryRef": "Homes Sold"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Share of Sales Value"
+                }
+              },
+              "queryRef": "_Measures.Share of Sales Value",
+              "nativeQueryRef": "Share of Sales Value"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Average Price"
+                }
+              },
+              "queryRef": "_Measures.Average Price",
+              "nativeQueryRef": "Average Price"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Price per sqm"
+                }
+              },
+              "queryRef": "_Measures.Price per sqm",
+              "nativeQueryRef": "Price per sqm"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Price per sqm YoY %"
+                }
+              },
+              "queryRef": "_Measures.Price per sqm YoY %",
+              "nativeQueryRef": "Price per sqm YoY %"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "_Measures"
+                  }
+                },
+                "Property": "Price per sqm YoY %"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

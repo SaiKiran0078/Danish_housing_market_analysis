@@ -1,0 +1,25 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["CsvPath","Housing Data"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table 'Housing Data'
+ref table Date
+ref table _Measures
+ref table 'Metric Selector'
+ref table 'Rank Mode'
+ref table 'Top N'
+ref table 'Min Sales'
+
+ref cultureInfo en-US
+

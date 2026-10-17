@@ -1,0 +1,41 @@
+-- Create each with Modeling > New table
+
+Date = 
+ADDCOLUMNS (
+    CALENDAR (
+        DATE ( YEAR ( MIN ( 'Housing Data'[Sale Date] ) ), 1, 1 ),
+        MAX ( 'Housing Data'[Sale Date] )
+    ),
+    "Year", YEAR ( [Date] ),
+    "Quarter Number", QUARTER ( [Date] ),
+    "Quarter", "Q" & QUARTER ( [Date] ),
+    "Year-Quarter", YEAR ( [Date] ) & " Q" & QUARTER ( [Date] ),
+    "Year-Quarter Sort", YEAR ( [Date] ) * 10 + QUARTER ( [Date] ),
+    "Quarter Start", DATE ( YEAR ( [Date] ), ( QUARTER ( [Date] ) - 1 ) * 3 + 1, 1 ),
+    "Month Number", MONTH ( [Date] ),
+    "Month", FORMAT ( [Date], "mmm", "en-US" ),
+    "Month Start", DATE ( YEAR ( [Date] ), MONTH ( [Date] ), 1 ),
+    "Decade", FLOOR ( YEAR ( [Date] ), 10 ) & "s"
+)
+
+Metric Selector = 
+DATATABLE (
+    "Metric", STRING,
+    "Metric Order", INTEGER,
+    { { "Sales Value", 1 }, { "Homes Sold", 2 }, { "Average Price", 3 }, { "Price per sqm", 4 } }
+)
+
+Rank Mode = 
+DATATABLE (
+    "Mode", STRING,
+    "Mode Order", INTEGER,
+    { { "Highest", 1 }, { "Lowest", 2 } }
+)
+
+Top N = 
+SELECTCOLUMNS ( GENERATESERIES ( 5, 25, 5 ), "Top N", [Value] )
+
+Min Sales = 
+SELECTCOLUMNS ( GENERATESERIES ( 0, 200, 10 ), "Min Sales", [Value] )
+
+-- Then: Mark 'Date' as date table (Date[Date]); relate 'Housing Data'[Sale Date] -> Date[Date] (many-to-one). Sort columns: set 'Sort by column' as listed in the guide.

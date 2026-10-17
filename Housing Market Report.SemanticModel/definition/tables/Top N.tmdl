@@ -1,0 +1,16 @@
+table 'Top N'
+	lineageTag: 4e1218d5-6d14-51f6-bd49-da88d7ebceed
+
+	column 'Top N'
+		dataType: int64
+		formatString: 0
+		lineageTag: bc185cae-724d-5a79-8e05-60b503e9805e
+		summarizeBy: none
+		sourceColumn: [Top N]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Top N' = calculated
+		mode: import
+		source = SELECTCOLUMNS ( GENERATESERIES ( 5, 25, 5 ), "Top N", [Value] )
+

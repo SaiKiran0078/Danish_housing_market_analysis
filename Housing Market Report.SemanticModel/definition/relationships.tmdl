@@ -1,0 +1,5 @@
+relationship 58327032-8a76-5625-9af4-06638c282236
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Housing Data'.'Sale Date'
+	toColumn: Date.Date
+

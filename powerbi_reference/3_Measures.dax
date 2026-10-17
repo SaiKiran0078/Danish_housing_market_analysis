@@ -1,0 +1,559 @@
+-- Create an empty table named _Measures (Enter data), then add each measure there (Modeling > New measure).
+-- Paste the lines below one measure at a time.
+
+
+-- ===== 1 Core KPIs =====
+-- Sum of purchase prices (DKK).
+Total Sales Value = 
+SUM ( 'Housing Data'[Purchase Price] )
+-- format: #,0
+
+-- Number of sales (one row per sale).
+Homes Sold = 
+COUNTROWS ( 'Housing Data' )
+-- format: #,0
+
+-- Mean purchase price.
+Average Price = 
+DIVIDE ( [Total Sales Value], [Homes Sold] )
+-- format: #,0
+
+-- Typical (median) purchase price.
+Median Price = 
+MEDIAN ( 'Housing Data'[Purchase Price] )
+-- format: #,0
+
+Total Area sqm = 
+SUM ( 'Housing Data'[Size sqm] )
+-- format: #,0
+
+-- Weighted price per square metre = total value / total sqm.
+Price per sqm = 
+DIVIDE ( [Total Sales Value], [Total Area sqm] )
+-- format: #,0
+
+-- Median of the per-sale price per sqm.
+Median Price per sqm = 
+MEDIAN ( 'Housing Data'[Price per sqm (Row)] )
+-- format: #,0
+
+Average Size sqm = 
+AVERAGE ( 'Housing Data'[Size sqm] )
+-- format: #,0.0
+
+Average Rooms = 
+AVERAGE ( 'Housing Data'[Rooms] )
+-- format: 0.0
+
+-- Years between year built and sale (unknown build years excluded).
+Average Building Age = 
+AVERAGE ( 'Housing Data'[Building Age] )
+-- format: 0.0
+
+Highest Sale Price = 
+MAX ( 'Housing Data'[Purchase Price] )
+-- format: #,0
+
+Lowest Sale Price = 
+MIN ( 'Housing Data'[Purchase Price] )
+-- format: #,0
+
+-- Average % difference between the offer and the price paid (negative = sold below offer).
+Average Offer vs Sale % = 
+AVERAGE ( 'Housing Data'[Offer vs Sale %] )
+-- format: 0.0%
+
+-- Months in context that contain at least one sale.
+Months with Sales = 
+COUNTROWS ( FILTER ( VALUES ( 'Date'[Month Start] ), CALCULATE ( COUNTROWS ( 'Housing Data' ) ) > 0 ) )
+-- format: 0
+
+
+-- ===== 2 Prior year and growth =====
+-- Total Sales Value for the same period one year earlier (like for like).
+Sales Value PY = 
+CALCULATE ( [Total Sales Value], DATEADD ( 'Date'[Date], -1, YEAR ) )
+-- format: #,0
+
+-- Homes Sold for the same period one year earlier (like for like).
+Homes Sold PY = 
+CALCULATE ( [Homes Sold], DATEADD ( 'Date'[Date], -1, YEAR ) )
+-- format: #,0
+
+-- Average Price for the same period one year earlier (like for like).
+Average Price PY = 
+CALCULATE ( [Average Price], DATEADD ( 'Date'[Date], -1, YEAR ) )
+-- format: #,0
+
+-- Median Price for the same period one year earlier (like for like).
+Median Price PY = 
+CALCULATE ( [Median Price], DATEADD ( 'Date'[Date], -1, YEAR ) )
+-- format: #,0
+
+-- Price per sqm for the same period one year earlier (like for like).
+Price per sqm PY = 
+CALCULATE ( [Price per sqm], DATEADD ( 'Date'[Date], -1, YEAR ) )
+-- format: #,0
+
+-- Change in Total Sales Value versus the same period one year earlier.
+Sales Value YoY % = 
+DIVIDE ( [Total Sales Value] - [Sales Value PY], [Sales Value PY] )
+-- format: +0.0%;-0.0%;0.0%
+
+-- Change in Homes Sold versus the same period one year earlier.
+Homes Sold YoY % = 
+DIVIDE ( [Homes Sold] - [Homes Sold PY], [Homes Sold PY] )
+-- format: +0.0%;-0.0%;0.0%
+
+-- Change in Average Price versus the same period one year earlier.
+Average Price YoY % = 
+DIVIDE ( [Average Price] - [Average Price PY], [Average Price PY] )
+-- format: +0.0%;-0.0%;0.0%
+
+-- Change in Median Price versus the same period one year earlier.
+Median Price YoY % = 
+DIVIDE ( [Median Price] - [Median Price PY], [Median Price PY] )
+-- format: +0.0%;-0.0%;0.0%
+
+-- Change in Price per sqm versus the same period one year earlier.
+Price per sqm YoY % = 
+DIVIDE ( [Price per sqm] - [Price per sqm PY], [Price per sqm PY] )
+-- format: +0.0%;-0.0%;0.0%
+
+Offer vs Sale PY = 
+CALCULATE ( [Average Offer vs Sale %], DATEADD ( 'Date'[Date], -1, YEAR ) )
+-- format: 0.0%
+
+-- Change in average offer-vs-sale gap, in percentage points.
+Offer vs Sale YoY pp = 
+IF ( NOT ISBLANK ( [Offer vs Sale PY] ) && NOT ISBLANK ( [Average Offer vs Sale %] ), ( [Average Offer vs Sale %] - [Offer vs Sale PY] ) * 100 )
+-- format: +0.0\ \p\p;-0.0\ \p\p;0.0\ \p\p
+
+
+-- ===== 3 Latest year cards =====
+-- Last year in the current selection.
+Latest Year = 
+MAX ( 'Date'[Year] )
+-- format: 0
+
+-- TRUE when the last year in the selection ends before 31 December.
+Latest Year Is Partial = 
+VAR d = MAX ( 'Date'[Date] )
+RETURN d < DATE ( YEAR ( d ), 12, 31 )
+
+Comparison Label = 
+VAR ly = [Latest Year]
+VAR d = MAX ( 'Date'[Date] )
+RETURN
+    "Change vs prior year, like for like: "
+        & IF (
+            [Latest Year Is Partial],
+            ly & " to " & FORMAT ( d, "d mmm", "en-US" ) & " vs the same period of " & ( ly - 1 ),
+            ly & " vs " & ( ly - 1 )
+        )
+
+-- Sales Value change for the latest year in the selection vs the same period a year earlier.
+Sales Value YoY % (Latest Yr) = 
+VAR ly = [Latest Year]
+RETURN CALCULATE ( [Sales Value YoY %], 'Date'[Year] = ly )
+-- format: \▲\ 0.0%;\▼\ 0.0%;\–\ 0.0%
+
+-- Homes Sold change for the latest year in the selection vs the same period a year earlier.
+Homes Sold YoY % (Latest Yr) = 
+VAR ly = [Latest Year]
+RETURN CALCULATE ( [Homes Sold YoY %], 'Date'[Year] = ly )
+-- format: \▲\ 0.0%;\▼\ 0.0%;\–\ 0.0%
+
+-- Average Price change for the latest year in the selection vs the same period a year earlier.
+Average Price YoY % (Latest Yr) = 
+VAR ly = [Latest Year]
+RETURN CALCULATE ( [Average Price YoY %], 'Date'[Year] = ly )
+-- format: \▲\ 0.0%;\▼\ 0.0%;\–\ 0.0%
+
+-- Median Price change for the latest year in the selection vs the same period a year earlier.
+Median Price YoY % (Latest Yr) = 
+VAR ly = [Latest Year]
+RETURN CALCULATE ( [Median Price YoY %], 'Date'[Year] = ly )
+-- format: \▲\ 0.0%;\▼\ 0.0%;\–\ 0.0%
+
+-- Price per sqm change for the latest year in the selection vs the same period a year earlier.
+Price per sqm YoY % (Latest Yr) = 
+VAR ly = [Latest Year]
+RETURN CALCULATE ( [Price per sqm YoY %], 'Date'[Year] = ly )
+-- format: \▲\ 0.0%;\▼\ 0.0%;\–\ 0.0%
+
+Offer vs Sale YoY pp (Latest Yr) = 
+VAR ly = [Latest Year]
+RETURN CALCULATE ( [Offer vs Sale YoY pp], 'Date'[Year] = ly )
+-- format: \▲\ 0.0\ \p\p;\▼\ 0.0\ \p\p;\–\ 0.0\ \p\p
+
+
+-- ===== 10 Formatting helpers =====
+Delta Color Sales Value = 
+VAR v = [Sales Value YoY % (Latest Yr)]
+RETURN IF ( ISBLANK ( v ), "#656E7F", IF ( v > 0, "#0B6B0B", IF ( v < 0, "#B42323", "#656E7F" ) ) )
+
+Delta Color Homes Sold = 
+VAR v = [Homes Sold YoY % (Latest Yr)]
+RETURN IF ( ISBLANK ( v ), "#656E7F", IF ( v > 0, "#0B6B0B", IF ( v < 0, "#B42323", "#656E7F" ) ) )
+
+Delta Color Average Price = 
+VAR v = [Average Price YoY % (Latest Yr)]
+RETURN IF ( ISBLANK ( v ), "#656E7F", IF ( v > 0, "#0B6B0B", IF ( v < 0, "#B42323", "#656E7F" ) ) )
+
+Delta Color Median Price = 
+VAR v = [Median Price YoY % (Latest Yr)]
+RETURN IF ( ISBLANK ( v ), "#656E7F", IF ( v > 0, "#0B6B0B", IF ( v < 0, "#B42323", "#656E7F" ) ) )
+
+Delta Color Price per sqm = 
+VAR v = [Price per sqm YoY % (Latest Yr)]
+RETURN IF ( ISBLANK ( v ), "#656E7F", IF ( v > 0, "#0B6B0B", IF ( v < 0, "#B42323", "#656E7F" ) ) )
+
+Delta Color Offer vs Sale = 
+VAR v = [Offer vs Sale YoY pp (Latest Yr)]
+RETURN IF ( ISBLANK ( v ), "#656E7F", IF ( v > 0, "#0B6B0B", IF ( v < 0, "#B42323", "#656E7F" ) ) )
+
+
+-- ===== 4 Trends and index =====
+Sales Value YTD = 
+TOTALYTD ( [Total Sales Value], 'Date'[Date] )
+-- format: #,0
+
+Sales Value YTD PY = 
+CALCULATE ( [Sales Value YTD], DATEADD ( 'Date'[Date], -1, YEAR ) )
+-- format: #,0
+
+Sales Value YTD YoY % = 
+DIVIDE ( [Sales Value YTD] - [Sales Value YTD PY], [Sales Value YTD PY] )
+-- format: +0.0%;-0.0%;0.0%
+
+-- Sales value over the 12 months ending at the last date in context.
+Rolling 12M Sales Value = 
+CALCULATE ( [Total Sales Value], DATESINPERIOD ( 'Date'[Date], MAX ( 'Date'[Date] ), -12, MONTH ) )
+-- format: #,0
+
+Rolling 12M Homes Sold = 
+CALCULATE ( [Homes Sold], DATESINPERIOD ( 'Date'[Date], MAX ( 'Date'[Date] ), -12, MONTH ) )
+-- format: #,0
+
+First Year in Selection = 
+MINX ( ALLSELECTED ( 'Date'[Year] ), 'Date'[Year] )
+-- format: 0
+
+Last Year in Selection = 
+MAXX ( ALLSELECTED ( 'Date'[Year] ), 'Date'[Year] )
+-- format: 0
+
+-- Price per sqm indexed to the first selected year = 100.
+Price per sqm Index = 
+VAR baseYear = [First Year in Selection]
+VAR baseValue = CALCULATE ( [Price per sqm], 'Date'[Year] = baseYear )
+RETURN DIVIDE ( [Price per sqm], baseValue ) * 100
+-- format: 0.0
+
+Average Price Index = 
+VAR baseYear = [First Year in Selection]
+VAR baseValue = CALCULATE ( [Average Price], 'Date'[Year] = baseYear )
+RETURN DIVIDE ( [Average Price], baseValue ) * 100
+-- format: 0.0
+
+-- Compound annual growth of Average Price between the first and last selected year.
+Average Price CAGR = 
+VAR y0 = [First Year in Selection]
+VAR y1 = [Last Year in Selection]
+VAR p0 = CALCULATE ( [Average Price], 'Date'[Year] = y0 )
+VAR p1 = CALCULATE ( [Average Price], 'Date'[Year] = y1 )
+VAR n = y1 - y0
+RETURN IF ( n > 0 && p0 > 0 && p1 > 0, DIVIDE ( p1, p0 ) ^ ( 1 / n ) - 1 )
+-- format: 0.0%
+
+-- Compound annual growth of Price per sqm between the first and last selected year.
+Price per sqm CAGR = 
+VAR y0 = [First Year in Selection]
+VAR y1 = [Last Year in Selection]
+VAR p0 = CALCULATE ( [Price per sqm], 'Date'[Year] = y0 )
+VAR p1 = CALCULATE ( [Price per sqm], 'Date'[Year] = y1 )
+VAR n = y1 - y0
+RETURN IF ( n > 0 && p0 > 0 && p1 > 0, DIVIDE ( p1, p0 ) ^ ( 1 / n ) - 1 )
+-- format: 0.0%
+
+Average Price Change Since Start % = 
+VAR y0 = [First Year in Selection]
+VAR y1 = [Last Year in Selection]
+VAR p0 = CALCULATE ( [Average Price], 'Date'[Year] = y0 )
+VAR p1 = CALCULATE ( [Average Price], 'Date'[Year] = y1 )
+RETURN IF ( y1 > y0 && p0 > 0 && p1 > 0, DIVIDE ( p1, p0 ) - 1 )
+-- format: +0.0%;-0.0%;0.0%
+
+-- TRUE for a year that is not fully covered by the data (missing months, or the final part-year).
+Year Is Incomplete = 
+VAR y = MAX ( 'Date'[Year] )
+VAR lastDate = CALCULATE ( MAX ( 'Housing Data'[Sale Date] ), REMOVEFILTERS ( 'Housing Data' ) )
+VAR expected = IF ( y = YEAR ( lastDate ), MONTH ( lastDate ), 12 )
+VAR actual =
+    COUNTROWS (
+        FILTER (
+            VALUES ( 'Date'[Month Start] ),
+            CALCULATE ( COUNTROWS ( 'Housing Data' ), REMOVEFILTERS ( 'Housing Data' ) ) > 0
+        )
+    )
+VAR partialLastYear = y = YEAR ( lastDate ) && lastDate < DATE ( y, 12, 31 )
+RETURN actual < expected || partialLastYear
+
+
+-- ===== 10 Formatting helpers =====
+-- Light blue for incomplete years, blue otherwise.
+Year Bar Color = 
+IF ( [Year Is Incomplete], "#9EC5F4", "#2A78D6" )
+
+YoY Bar Color = 
+IF ( [Selected Metric YoY %] < 0, "#E34948", "#2A78D6" )
+
+
+-- ===== 5 Metric selector =====
+Selected Metric Name = 
+SELECTEDVALUE ( 'Metric Selector'[Metric], "Sales Value" )
+
+Selected Metric = 
+SWITCH (
+    [Selected Metric Name],
+    "Sales Value", [Total Sales Value],
+    "Homes Sold", [Homes Sold],
+    "Average Price", [Average Price],
+    "Price per sqm", [Price per sqm],
+    BLANK ()
+)
+-- format: #,0
+
+Selected Metric PY = 
+SWITCH (
+    [Selected Metric Name],
+    "Sales Value", [Sales Value PY],
+    "Homes Sold", [Homes Sold PY],
+    "Average Price", [Average Price PY],
+    "Price per sqm", [Price per sqm PY],
+    BLANK ()
+)
+-- format: #,0
+
+Selected Metric YoY % = 
+DIVIDE ( [Selected Metric] - [Selected Metric PY], [Selected Metric PY] )
+-- format: +0.0%;-0.0%;0.0%
+
+Selected Metric Title = 
+[Selected Metric Name] & " by year" & IF ( [Selected Metric Name] IN { "Sales Value", "Average Price", "Price per sqm" }, " (DKK)", "" )
+
+Selected Metric YoY Title = 
+[Selected Metric Name] & ": change vs prior year (%)"
+
+
+-- ===== 6 Rates and drivers =====
+-- Nominal interest rate: average of the quarterly values in context.
+Interest Rate = 
+AVERAGEX ( VALUES ( 'Housing Data'[Quarter Key] ), CALCULATE ( MAX ( 'Housing Data'[Interest Rate] ) ) )
+-- format: 0.00%
+
+Mortgage Bond Yield = 
+AVERAGEX ( VALUES ( 'Housing Data'[Quarter Key] ), CALCULATE ( MAX ( 'Housing Data'[Bond Yield] ) ) )
+-- format: 0.00%
+
+Inflation Rate = 
+AVERAGEX ( VALUES ( 'Housing Data'[Quarter Key] ), CALCULATE ( MAX ( 'Housing Data'[Inflation Rate] ) ) )
+-- format: 0.00%
+
+-- Nominal interest rate minus inflation.
+Real Interest Rate = 
+IF ( NOT ISBLANK ( [Interest Rate] ) && NOT ISBLANK ( [Inflation Rate] ), [Interest Rate] - [Inflation Rate] )
+-- format: 0.00%
+
+-- Most recent quarterly value in the selection.
+Interest Rate (Latest) = 
+VAR lastDate = CALCULATE ( MAX ( 'Housing Data'[Sale Date] ), NOT ( ISBLANK ( 'Housing Data'[Interest Rate] ) ) )
+RETURN CALCULATE ( MAX ( 'Housing Data'[Interest Rate] ), 'Housing Data'[Sale Date] = lastDate )
+-- format: 0.00%
+
+Mortgage Bond Yield (Latest) = 
+VAR lastDate = CALCULATE ( MAX ( 'Housing Data'[Sale Date] ), NOT ( ISBLANK ( 'Housing Data'[Bond Yield] ) ) )
+RETURN CALCULATE ( MAX ( 'Housing Data'[Bond Yield] ), 'Housing Data'[Sale Date] = lastDate )
+-- format: 0.00%
+
+Inflation Rate (Latest) = 
+VAR lastDate = CALCULATE ( MAX ( 'Housing Data'[Sale Date] ), NOT ( ISBLANK ( 'Housing Data'[Inflation Rate] ) ) )
+RETURN CALCULATE ( MAX ( 'Housing Data'[Inflation Rate] ), 'Housing Data'[Sale Date] = lastDate )
+-- format: 0.00%
+
+Real Interest Rate (Latest) = 
+VAR lastDate =
+    CALCULATE (
+        MAX ( 'Housing Data'[Sale Date] ),
+        NOT ( ISBLANK ( 'Housing Data'[Interest Rate] ) ),
+        NOT ( ISBLANK ( 'Housing Data'[Inflation Rate] ) )
+    )
+RETURN
+    CALCULATE (
+        MAX ( 'Housing Data'[Interest Rate] ) - MAX ( 'Housing Data'[Inflation Rate] ),
+        'Housing Data'[Sale Date] = lastDate
+    )
+-- format: 0.00%
+
+
+-- ===== 7 Buyer behaviour =====
+Sold Below Offer % = 
+DIVIDE ( CALCULATE ( [Homes Sold], 'Housing Data'[Offer Outcome] = "Sold below offer" ), [Homes Sold] )
+-- format: 0.0%
+
+Sold At Offer % = 
+DIVIDE ( CALCULATE ( [Homes Sold], 'Housing Data'[Offer Outcome] = "Sold at offer" ), [Homes Sold] )
+-- format: 0.0%
+
+Sold Above Offer % = 
+DIVIDE ( CALCULATE ( [Homes Sold], 'Housing Data'[Offer Outcome] = "Sold above offer" ), [Homes Sold] )
+-- format: 0.0%
+
+-- Average % below the offer, counting only homes that sold below offer.
+Average Discount When Below Offer = 
+CALCULATE ( [Average Offer vs Sale %], 'Housing Data'[Offer Outcome] = "Sold below offer" )
+-- format: 0.0%
+
+Auction Share = 
+DIVIDE ( CALCULATE ( [Homes Sold], 'Housing Data'[Sales Type] = "Auction" ), [Homes Sold] )
+-- format: 0.0%
+
+Sales Type Share = 
+DIVIDE ( [Homes Sold], CALCULATE ( [Homes Sold], ALLSELECTED ( 'Housing Data'[Sales Type] ) ) )
+-- format: 0.0%
+
+
+-- ===== 8 Share and ranking =====
+Share of Sales Value = 
+DIVIDE ( [Total Sales Value], CALCULATE ( [Total Sales Value], ALLSELECTED ( 'Housing Data' ) ) )
+-- format: 0.0%
+
+Share of Homes Sold = 
+DIVIDE ( [Homes Sold], CALCULATE ( [Homes Sold], ALLSELECTED ( 'Housing Data' ) ) )
+-- format: 0.0%
+
+-- Minimum number of sales for a city to be ranked (slicer).
+Min Sales Value = 
+SELECTEDVALUE ( 'Min Sales'[Min Sales], 40 )
+-- format: 0
+
+-- How many cities to show in the ranking (slicer).
+Top N Value = 
+SELECTEDVALUE ( 'Top N'[Top N], 10 )
+-- format: 0
+
+-- Rank of a city by price per sqm among cities with enough sales; direction set by the Rank Mode slicer.
+City Rank = 
+VAR minSales = [Min Sales Value]
+VAR rankMode = SELECTEDVALUE ( 'Rank Mode'[Mode], "Highest" )
+VAR eligible = FILTER ( ALLSELECTED ( 'Housing Data'[City] ), [Homes Sold] >= minSales )
+RETURN
+    IF (
+        [Homes Sold] >= minSales,
+        RANKX ( eligible, [Price per sqm], , IF ( rankMode = "Highest", DESC, ASC ), DENSE )
+    )
+-- format: 0
+
+City Rank Shown = 
+VAR r = [City Rank] RETURN IF ( NOT ISBLANK ( r ) && r <= [Top N Value], r )
+-- format: 0
+
+Ranked City Price per sqm = 
+IF ( NOT ISBLANK ( [City Rank Shown] ), [Price per sqm] )
+-- format: #,0
+
+
+-- ===== 9 Narrative and labels =====
+Top Area by Value = 
+CONCATENATEX ( TOPN ( 1, ALLSELECTED ( 'Housing Data'[Area] ), [Total Sales Value], DESC ), 'Housing Data'[Area], ", " )
+
+Top Area Share of Value = 
+VAR topArea = TOPN ( 1, ALLSELECTED ( 'Housing Data'[Area] ), [Total Sales Value], DESC )
+VAR topValue = MAXX ( topArea, [Total Sales Value] )
+RETURN DIVIDE ( topValue, CALCULATE ( [Total Sales Value], ALLSELECTED ( 'Housing Data' ) ) )
+-- format: 0.0%
+
+Priciest Area (per sqm) = 
+CONCATENATEX ( TOPN ( 1, ALLSELECTED ( 'Housing Data'[Area] ), [Price per sqm], DESC ), 'Housing Data'[Area], ", " )
+
+-- Plain-English summary line 1 (updates with filters).
+Insight 1 = 
+VAR n = [Homes Sold]
+VAR fy = [First Year in Selection]
+VAR ly = [Last Year in Selection]
+VAR pFirst = CALCULATE ( [Price per sqm], 'Date'[Year] = fy )
+VAR pLast = CALCULATE ( [Price per sqm], 'Date'[Year] = ly )
+VAR hYoY = [Homes Sold YoY % (Latest Yr)]
+VAR aYoY = [Average Price YoY % (Latest Yr)]
+RETURN
+    IF (
+        n = 0,
+        "No sales match the current filters.",
+        "Sales value totals DKK " & FORMAT ( [Total Sales Value] / 1000000000, "#,0.0" ) & "bn across "
+            & FORMAT ( n, "#,0" ) & " homes. The average home sold for DKK "
+            & FORMAT ( [Average Price] / 1000000, "0.00" ) & "m and the median for DKK "
+            & FORMAT ( [Median Price] / 1000000, "0.00" ) & "m."
+    )
+
+-- Plain-English summary line 2.
+Insight 2 = 
+VAR n = [Homes Sold]
+VAR fy = [First Year in Selection]
+VAR ly = [Last Year in Selection]
+VAR pFirst = CALCULATE ( [Price per sqm], 'Date'[Year] = fy )
+VAR pLast = CALCULATE ( [Price per sqm], 'Date'[Year] = ly )
+VAR hYoY = [Homes Sold YoY % (Latest Yr)]
+VAR aYoY = [Average Price YoY % (Latest Yr)]
+RETURN
+    IF (
+        n = 0,
+        BLANK (),
+        IF (
+            ly > fy && pFirst > 0 && pLast > 0,
+            "Price per sqm " & IF ( pLast >= pFirst, "rose", "fell" ) & " from DKK " & FORMAT ( pFirst, "#,0" )
+                & " in " & fy & " to DKK " & FORMAT ( pLast, "#,0" ) & " in " & ly
+                & ", about " & FORMAT ( [Price per sqm CAGR], "0.0%" ) & " a year.",
+            "Select a range of at least two years to see the long-run price trend."
+        )
+    )
+
+-- Plain-English summary line 3.
+Insight 3 = 
+VAR n = [Homes Sold]
+VAR fy = [First Year in Selection]
+VAR ly = [Last Year in Selection]
+VAR pFirst = CALCULATE ( [Price per sqm], 'Date'[Year] = fy )
+VAR pLast = CALCULATE ( [Price per sqm], 'Date'[Year] = ly )
+VAR hYoY = [Homes Sold YoY % (Latest Yr)]
+VAR aYoY = [Average Price YoY % (Latest Yr)]
+RETURN
+    IF (
+        n = 0,
+        BLANK (),
+        IF (
+            ISBLANK ( hYoY ) || ISBLANK ( aYoY ),
+            "There is no prior year to compare with in this selection.",
+            "In " & ly & ", homes sold were " & IF ( hYoY >= 0, "up ", "down " ) & FORMAT ( ABS ( hYoY ), "0.0%" )
+                & " and the average price " & IF ( aYoY >= 0, "up ", "down " ) & FORMAT ( ABS ( aYoY ), "0.0%" )
+                & " on the same period a year earlier."
+        )
+    )
+
+-- Plain-English summary line 4.
+Insight 4 = 
+IF (
+    [Homes Sold] = 0,
+    BLANK (),
+    [Top Area by Value] & " is the largest market with " & FORMAT ( [Top Area Share of Value], "0%" )
+        & " of sales value; " & [Priciest Area (per sqm)] & " has the highest price per sqm."
+)
+
+Footer Note = 
+VAR firstDate = CALCULATE ( MIN ( 'Housing Data'[Sale Date] ), REMOVEFILTERS ( 'Housing Data' ) )
+VAR lastDate = CALCULATE ( MAX ( 'Housing Data'[Sale Date] ), REMOVEFILTERS ( 'Housing Data' ) )
+VAR total = CALCULATE ( COUNTROWS ( 'Housing Data' ), REMOVEFILTERS ( 'Housing Data' ) )
+RETURN
+    "Source: Housing Data.csv  |  " & FORMAT ( total, "#,0" ) & " sales from " & FORMAT ( firstDate, "d mmm yyyy", "en-US" )
+        & " to " & FORMAT ( lastDate, "d mmm yyyy", "en-US" ) & "  |  Amounts in DKK  |  No sales are recorded for Dec 2016 to Jun 2017"
+

@@ -1,0 +1,7 @@
+expression CsvPath = "C:\Users\sajja\Downloads\Housing Data.csv" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: f70948ce-e2fb-595e-9f5b-d8a137f7fa65
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+

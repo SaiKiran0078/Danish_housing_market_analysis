@@ -1,0 +1,55 @@
+{
+  "name": "HousingMarketProfessional",
+  "dataColors": [
+    "#2878C8",
+    "#F28E2B",
+    "#16805D",
+    "#C83E4D",
+    "#7057A3",
+    "#63A6D8",
+    "#8C9AAE",
+    "#12345A"
+  ],
+  "good": "#16805D",
+  "neutral": "#667085",
+  "bad": "#C83E4D",
+  "maximum": "#2878C8",
+  "center": "#E8EDF4",
+  "minimum": "#F28E2B",
+  "foreground": "#243247",
+  "background": "#FFFFFF",
+  "tableAccent": "#12345A",
+  "textClasses": {
+    "callout": {
+      "fontSize": 25,
+      "fontFace": "Segoe UI Semibold",
+      "color": "#12345A"
+    },
+    "title": {
+      "fontSize": 11,
+      "fontFace": "Segoe UI Semibold",
+      "color": "#12345A"
+    },
+    "label": {
+      "fontSize": 9,
+      "fontFace": "Segoe UI",
+      "color": "#667085"
+    },
+    "header": {
+      "fontSize": 12,
+      "fontFace": "Segoe UI Semibold",
+      "color": "#243247"
+    }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "wordWrap": [
+          {
+            "show": true
+          }
+        ]
+      }
+    }
+  }
+}

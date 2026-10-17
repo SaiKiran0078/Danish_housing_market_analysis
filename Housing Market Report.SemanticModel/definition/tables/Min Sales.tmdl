@@ -1,0 +1,16 @@
+table 'Min Sales'
+	lineageTag: 47009975-7e9d-592b-81cf-f66e28c9896b
+
+	column 'Min Sales'
+		dataType: int64
+		formatString: 0
+		lineageTag: 659f7af8-4c38-56eb-baa7-1b6e85aba095
+		summarizeBy: none
+		sourceColumn: [Min Sales]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Min Sales' = calculated
+		mode: import
+		source = SELECTCOLUMNS ( GENERATESERIES ( 0, 200, 10 ), "Min Sales", [Value] )
+

@@ -1,0 +1,31 @@
+table 'Rank Mode'
+	lineageTag: dca2a2ed-e7f8-5435-b5da-8c163ce96eac
+
+	column Mode
+		dataType: string
+		lineageTag: 1f76f01e-7072-5493-adfa-8b41c15067f5
+		summarizeBy: none
+		sourceColumn: [Mode]
+		sortByColumn: 'Mode Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Mode Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 8aa2940d-0985-56ef-aeb4-ffaa57c93cdf
+		summarizeBy: none
+		sourceColumn: [Mode Order]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Rank Mode' = calculated
+		mode: import
+		source =
+				DATATABLE (
+				    "Mode", STRING,
+				    "Mode Order", INTEGER,
+				    { { "Highest", 1 }, { "Lowest", 2 } }
+				)
+

@@ -1,0 +1,695 @@
+table _Measures
+	lineageTag: dc703077-d44b-5074-8f65-d03fac6b416d
+
+	/// Sum of purchase prices (DKK).
+	measure 'Total Sales Value' = SUM ( 'Housing Data'[Purchase Price] )
+		formatString: #,0
+		displayFolder: 1 Core KPIs
+		lineageTag: 505dfa7f-8efe-540e-903e-820f975f5134
+
+	/// Number of sales (one row per sale).
+	measure 'Homes Sold' = COUNTROWS ( 'Housing Data' )
+		formatString: #,0
+		displayFolder: 1 Core KPIs
+		lineageTag: a31a2dc9-59c4-5039-86bd-fe5bd17df40f
+
+	/// Mean purchase price.
+	measure 'Average Price' = DIVIDE ( [Total Sales Value], [Homes Sold] )
+		formatString: #,0
+		displayFolder: 1 Core KPIs
+		lineageTag: a7ee9169-5907-5ea7-b03d-7e49b4e8fd36
+
+	/// Typical (median) purchase price.
+	measure 'Median Price' = MEDIAN ( 'Housing Data'[Purchase Price] )
+		formatString: #,0
+		displayFolder: 1 Core KPIs
+		lineageTag: 495cb422-411f-5fb2-ba0e-59d99a681a05
+
+	measure 'Total Area sqm' = SUM ( 'Housing Data'[Size sqm] )
+		formatString: #,0
+		displayFolder: 1 Core KPIs
+		lineageTag: 626554a8-b779-5315-9307-09dee7533bf4
+
+	/// Weighted price per square metre = total value / total sqm.
+	measure 'Price per sqm' = DIVIDE ( [Total Sales Value], [Total Area sqm] )
+		formatString: #,0
+		displayFolder: 1 Core KPIs
+		lineageTag: 535f5c9c-dc86-573d-9368-a7956bb393a9
+
+	/// Median of the per-sale price per sqm.
+	measure 'Median Price per sqm' = MEDIAN ( 'Housing Data'[Price per sqm (Row)] )
+		formatString: #,0
+		displayFolder: 1 Core KPIs
+		lineageTag: ea346a19-ba04-5210-9595-3f77245f83eb
+
+	measure 'Average Size sqm' = AVERAGE ( 'Housing Data'[Size sqm] )
+		formatString: #,0.0
+		displayFolder: 1 Core KPIs
+		lineageTag: 250c577b-ad87-5dfd-8f2a-468ce56dfaa4
+
+	measure 'Average Rooms' = AVERAGE ( 'Housing Data'[Rooms] )
+		formatString: 0.0
+		displayFolder: 1 Core KPIs
+		lineageTag: 904f265e-366d-5c4e-b329-17d1a4b05a09
+
+	/// Years between year built and sale (unknown build years excluded).
+	measure 'Average Building Age' = AVERAGE ( 'Housing Data'[Building Age] )
+		formatString: 0.0
+		displayFolder: 1 Core KPIs
+		lineageTag: 184fb859-f973-5422-8ea1-1437541118f2
+
+	measure 'Highest Sale Price' = MAX ( 'Housing Data'[Purchase Price] )
+		formatString: #,0
+		displayFolder: 1 Core KPIs
+		lineageTag: 9a105188-6393-50c5-863d-b329a3121277
+
+	measure 'Lowest Sale Price' = MIN ( 'Housing Data'[Purchase Price] )
+		formatString: #,0
+		displayFolder: 1 Core KPIs
+		lineageTag: 4d1b5704-a6bc-5a2b-8cdc-85aeceffefc6
+
+	/// Average % difference between the offer and the price paid (negative = sold below offer).
+	measure 'Average Offer vs Sale %' = AVERAGE ( 'Housing Data'[Offer vs Sale %] )
+		formatString: 0.0%
+		displayFolder: 1 Core KPIs
+		lineageTag: 4be45a37-6e42-5bb0-beea-7e6c8ccb9889
+
+	/// Months in context that contain at least one sale.
+	measure 'Months with Sales' = COUNTROWS ( FILTER ( VALUES ( 'Date'[Month Start] ), CALCULATE ( COUNTROWS ( 'Housing Data' ) ) > 0 ) )
+		formatString: 0
+		displayFolder: 1 Core KPIs
+		lineageTag: 619db4f0-45b3-5247-8af6-1bc305c96039
+
+	/// Total Sales Value for the same period one year earlier (like for like).
+	measure 'Sales Value PY' = CALCULATE ( [Total Sales Value], DATEADD ( 'Date'[Date], -1, YEAR ) )
+		formatString: #,0
+		displayFolder: 2 Prior year and growth
+		lineageTag: 5c29f73a-dcaf-5f13-a126-d943f1c5c660
+
+	/// Homes Sold for the same period one year earlier (like for like).
+	measure 'Homes Sold PY' = CALCULATE ( [Homes Sold], DATEADD ( 'Date'[Date], -1, YEAR ) )
+		formatString: #,0
+		displayFolder: 2 Prior year and growth
+		lineageTag: 5e43be86-6fc3-5005-8dae-197f5c9bbd28
+
+	/// Average Price for the same period one year earlier (like for like).
+	measure 'Average Price PY' = CALCULATE ( [Average Price], DATEADD ( 'Date'[Date], -1, YEAR ) )
+		formatString: #,0
+		displayFolder: 2 Prior year and growth
+		lineageTag: 707c0bba-cad6-5803-bef3-27d8817e8b4b
+
+	/// Median Price for the same period one year earlier (like for like).
+	measure 'Median Price PY' = CALCULATE ( [Median Price], DATEADD ( 'Date'[Date], -1, YEAR ) )
+		formatString: #,0
+		displayFolder: 2 Prior year and growth
+		lineageTag: 51c3be2b-8d2a-5286-b328-5846a5f95fa8
+
+	/// Price per sqm for the same period one year earlier (like for like).
+	measure 'Price per sqm PY' = CALCULATE ( [Price per sqm], DATEADD ( 'Date'[Date], -1, YEAR ) )
+		formatString: #,0
+		displayFolder: 2 Prior year and growth
+		lineageTag: 3d78aed9-a2b5-5021-9d06-6c3c7515843e
+
+	/// Change in Total Sales Value versus the same period one year earlier.
+	measure 'Sales Value YoY %' = DIVIDE ( [Total Sales Value] - [Sales Value PY], [Sales Value PY] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 2 Prior year and growth
+		lineageTag: 7a414107-2a48-50ad-a86e-638e3644327e
+
+	/// Change in Homes Sold versus the same period one year earlier.
+	measure 'Homes Sold YoY %' = DIVIDE ( [Homes Sold] - [Homes Sold PY], [Homes Sold PY] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 2 Prior year and growth
+		lineageTag: 67d94bba-d0d5-5ad4-9c00-eda07f985ec2
+
+	/// Change in Average Price versus the same period one year earlier.
+	measure 'Average Price YoY %' = DIVIDE ( [Average Price] - [Average Price PY], [Average Price PY] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 2 Prior year and growth
+		lineageTag: 09455d0f-6d2e-5cb2-8854-1f7ee38abe0f
+
+	/// Change in Median Price versus the same period one year earlier.
+	measure 'Median Price YoY %' = DIVIDE ( [Median Price] - [Median Price PY], [Median Price PY] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 2 Prior year and growth
+		lineageTag: ce35cb08-bec0-52f9-998e-99aecfd30d85
+
+	/// Change in Price per sqm versus the same period one year earlier.
+	measure 'Price per sqm YoY %' = DIVIDE ( [Price per sqm] - [Price per sqm PY], [Price per sqm PY] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 2 Prior year and growth
+		lineageTag: 3c298034-065a-58c4-aad8-534e5465cb27
+
+	measure 'Offer vs Sale PY' = CALCULATE ( [Average Offer vs Sale %], DATEADD ( 'Date'[Date], -1, YEAR ) )
+		formatString: 0.0%
+		displayFolder: 2 Prior year and growth
+		lineageTag: 679b102a-7964-528f-858d-9b8c0a16f29a
+
+	/// Change in average offer-vs-sale gap, in percentage points.
+	measure 'Offer vs Sale YoY pp' = IF ( NOT ISBLANK ( [Offer vs Sale PY] ) && NOT ISBLANK ( [Average Offer vs Sale %] ), ( [Average Offer vs Sale %] - [Offer vs Sale PY] ) * 100 )
+		formatString: +0.0\ \p\p;-0.0\ \p\p;0.0\ \p\p
+		displayFolder: 2 Prior year and growth
+		lineageTag: 7dbf007d-176a-5a06-ac6b-37b2384a94d6
+
+	/// Last year in the current selection.
+	measure 'Latest Year' = MAX ( 'Date'[Year] )
+		formatString: 0
+		displayFolder: 3 Latest year cards
+		lineageTag: 27eaf397-f0c9-529e-b901-043b2263e688
+
+	/// TRUE when the last year in the selection ends before 31 December.
+	measure 'Latest Year Is Partial' =
+			VAR d = MAX ( 'Date'[Date] )
+			RETURN d < DATE ( YEAR ( d ), 12, 31 )
+		displayFolder: 3 Latest year cards
+		lineageTag: 0cc3cd3b-2360-5077-96bb-0cb67cceef56
+
+	measure 'Comparison Label' =
+			VAR ly = [Latest Year]
+			VAR d = MAX ( 'Date'[Date] )
+			RETURN
+			    "Change vs prior year, like for like: "
+			        & IF (
+			            [Latest Year Is Partial],
+			            ly & " to " & FORMAT ( d, "d mmm", "en-US" ) & " vs the same period of " & ( ly - 1 ),
+			            ly & " vs " & ( ly - 1 )
+			        )
+		displayFolder: 3 Latest year cards
+		lineageTag: 33334144-bc1c-5390-b525-078a37b73172
+
+	/// Sales Value change for the latest year in the selection vs the same period a year earlier.
+	measure 'Sales Value YoY % (Latest Yr)' =
+			VAR ly = [Latest Year]
+			RETURN CALCULATE ( [Sales Value YoY %], 'Date'[Year] = ly )
+		formatString: \▲\ 0.0%;\▼\ 0.0%;\–\ 0.0%
+		displayFolder: 3 Latest year cards
+		lineageTag: cec57cac-1cc9-58c2-aab6-1b9e6879251d
+
+	/// Homes Sold change for the latest year in the selection vs the same period a year earlier.
+	measure 'Homes Sold YoY % (Latest Yr)' =
+			VAR ly = [Latest Year]
+			RETURN CALCULATE ( [Homes Sold YoY %], 'Date'[Year] = ly )
+		formatString: \▲\ 0.0%;\▼\ 0.0%;\–\ 0.0%
+		displayFolder: 3 Latest year cards
+		lineageTag: faa6e600-3016-54b6-98e6-499a8f3ca4f8
+
+	/// Average Price change for the latest year in the selection vs the same period a year earlier.
+	measure 'Average Price YoY % (Latest Yr)' =
+			VAR ly = [Latest Year]
+			RETURN CALCULATE ( [Average Price YoY %], 'Date'[Year] = ly )
+		formatString: \▲\ 0.0%;\▼\ 0.0%;\–\ 0.0%
+		displayFolder: 3 Latest year cards
+		lineageTag: e5c4735f-1bf6-5a1a-b925-979f0d0518b9
+
+	/// Median Price change for the latest year in the selection vs the same period a year earlier.
+	measure 'Median Price YoY % (Latest Yr)' =
+			VAR ly = [Latest Year]
+			RETURN CALCULATE ( [Median Price YoY %], 'Date'[Year] = ly )
+		formatString: \▲\ 0.0%;\▼\ 0.0%;\–\ 0.0%
+		displayFolder: 3 Latest year cards
+		lineageTag: 07cb0efe-b48d-53b8-b955-1768c7c6dc3c
+
+	/// Price per sqm change for the latest year in the selection vs the same period a year earlier.
+	measure 'Price per sqm YoY % (Latest Yr)' =
+			VAR ly = [Latest Year]
+			RETURN CALCULATE ( [Price per sqm YoY %], 'Date'[Year] = ly )
+		formatString: \▲\ 0.0%;\▼\ 0.0%;\–\ 0.0%
+		displayFolder: 3 Latest year cards
+		lineageTag: 4f3bfafe-4aac-5b88-9197-52b77fc31cf1
+
+	measure 'Offer vs Sale YoY pp (Latest Yr)' =
+			VAR ly = [Latest Year]
+			RETURN CALCULATE ( [Offer vs Sale YoY pp], 'Date'[Year] = ly )
+		formatString: \▲\ 0.0\ \p\p;\▼\ 0.0\ \p\p;\–\ 0.0\ \p\p
+		displayFolder: 3 Latest year cards
+		lineageTag: aef397ad-0b22-5996-ab36-e761dc73a22d
+
+	measure 'Delta Color Sales Value' =
+			VAR v = [Sales Value YoY % (Latest Yr)]
+			RETURN IF ( ISBLANK ( v ), "#656E7F", IF ( v > 0, "#0B6B0B", IF ( v < 0, "#B42323", "#656E7F" ) ) )
+		isHidden
+		displayFolder: 10 Formatting helpers
+		lineageTag: 2b8db438-e55d-5cae-881d-318dd7568250
+
+	measure 'Delta Color Homes Sold' =
+			VAR v = [Homes Sold YoY % (Latest Yr)]
+			RETURN IF ( ISBLANK ( v ), "#656E7F", IF ( v > 0, "#0B6B0B", IF ( v < 0, "#B42323", "#656E7F" ) ) )
+		isHidden
+		displayFolder: 10 Formatting helpers
+		lineageTag: c09171b4-977d-5b81-ba97-8bd3238ec344
+
+	measure 'Delta Color Average Price' =
+			VAR v = [Average Price YoY % (Latest Yr)]
+			RETURN IF ( ISBLANK ( v ), "#656E7F", IF ( v > 0, "#0B6B0B", IF ( v < 0, "#B42323", "#656E7F" ) ) )
+		isHidden
+		displayFolder: 10 Formatting helpers
+		lineageTag: d8a9b581-7cf5-54f4-9362-49284c041dd2
+
+	measure 'Delta Color Median Price' =
+			VAR v = [Median Price YoY % (Latest Yr)]
+			RETURN IF ( ISBLANK ( v ), "#656E7F", IF ( v > 0, "#0B6B0B", IF ( v < 0, "#B42323", "#656E7F" ) ) )
+		isHidden
+		displayFolder: 10 Formatting helpers
+		lineageTag: 7308da75-0dd5-5a5e-b296-9a45249369c2
+
+	measure 'Delta Color Price per sqm' =
+			VAR v = [Price per sqm YoY % (Latest Yr)]
+			RETURN IF ( ISBLANK ( v ), "#656E7F", IF ( v > 0, "#0B6B0B", IF ( v < 0, "#B42323", "#656E7F" ) ) )
+		isHidden
+		displayFolder: 10 Formatting helpers
+		lineageTag: 7829ee2f-4a58-5af0-830a-0450d44fc4f0
+
+	measure 'Delta Color Offer vs Sale' =
+			VAR v = [Offer vs Sale YoY pp (Latest Yr)]
+			RETURN IF ( ISBLANK ( v ), "#656E7F", IF ( v > 0, "#0B6B0B", IF ( v < 0, "#B42323", "#656E7F" ) ) )
+		isHidden
+		displayFolder: 10 Formatting helpers
+		lineageTag: 2dc4981b-fce1-5367-bf1f-dbeea4772cb8
+
+	measure 'Sales Value YTD' = TOTALYTD ( [Total Sales Value], 'Date'[Date] )
+		formatString: #,0
+		displayFolder: 4 Trends and index
+		lineageTag: 4ca0bc0c-a2d6-571f-b1b9-738df842d52a
+
+	measure 'Sales Value YTD PY' = CALCULATE ( [Sales Value YTD], DATEADD ( 'Date'[Date], -1, YEAR ) )
+		formatString: #,0
+		displayFolder: 4 Trends and index
+		lineageTag: 21674703-7896-5cc0-aef8-04c594d0ee0a
+
+	measure 'Sales Value YTD YoY %' = DIVIDE ( [Sales Value YTD] - [Sales Value YTD PY], [Sales Value YTD PY] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 4 Trends and index
+		lineageTag: 692332e3-5a59-53f7-a830-dbbd6b34b6f6
+
+	/// Sales value over the 12 months ending at the last date in context.
+	measure 'Rolling 12M Sales Value' = CALCULATE ( [Total Sales Value], DATESINPERIOD ( 'Date'[Date], MAX ( 'Date'[Date] ), -12, MONTH ) )
+		formatString: #,0
+		displayFolder: 4 Trends and index
+		lineageTag: 41471338-0c82-5807-89a7-1df773ea0fcc
+
+	measure 'Rolling 12M Homes Sold' = CALCULATE ( [Homes Sold], DATESINPERIOD ( 'Date'[Date], MAX ( 'Date'[Date] ), -12, MONTH ) )
+		formatString: #,0
+		displayFolder: 4 Trends and index
+		lineageTag: c7ac44ff-5309-56e8-98f9-c57647942ad9
+
+	measure 'First Year in Selection' = MINX ( ALLSELECTED ( 'Date'[Year] ), 'Date'[Year] )
+		formatString: 0
+		displayFolder: 4 Trends and index
+		lineageTag: f4bf5e08-cb91-54f7-9503-b6ccc2f6828b
+
+	measure 'Last Year in Selection' = MAXX ( ALLSELECTED ( 'Date'[Year] ), 'Date'[Year] )
+		formatString: 0
+		displayFolder: 4 Trends and index
+		lineageTag: 384faafb-a803-5630-9d9c-354ee77b9dfb
+
+	/// Price per sqm indexed to the first selected year = 100.
+	measure 'Price per sqm Index' =
+			VAR baseYear = [First Year in Selection]
+			VAR baseValue = CALCULATE ( [Price per sqm], 'Date'[Year] = baseYear )
+			RETURN DIVIDE ( [Price per sqm], baseValue ) * 100
+		formatString: 0.0
+		displayFolder: 4 Trends and index
+		lineageTag: e47539b9-611e-5612-a044-402e1882424d
+
+	measure 'Average Price Index' =
+			VAR baseYear = [First Year in Selection]
+			VAR baseValue = CALCULATE ( [Average Price], 'Date'[Year] = baseYear )
+			RETURN DIVIDE ( [Average Price], baseValue ) * 100
+		formatString: 0.0
+		displayFolder: 4 Trends and index
+		lineageTag: a67b1322-976e-5981-8733-cd2c56bd2a89
+
+	/// Compound annual growth of Average Price between the first and last selected year.
+	measure 'Average Price CAGR' =
+			VAR y0 = [First Year in Selection]
+			VAR y1 = [Last Year in Selection]
+			VAR p0 = CALCULATE ( [Average Price], 'Date'[Year] = y0 )
+			VAR p1 = CALCULATE ( [Average Price], 'Date'[Year] = y1 )
+			VAR n = y1 - y0
+			RETURN IF ( n > 0 && p0 > 0 && p1 > 0, DIVIDE ( p1, p0 ) ^ ( 1 / n ) - 1 )
+		formatString: 0.0%
+		displayFolder: 4 Trends and index
+		lineageTag: a6fe3323-9e64-5da3-ac0a-bb643d09a58f
+
+	/// Compound annual growth of Price per sqm between the first and last selected year.
+	measure 'Price per sqm CAGR' =
+			VAR y0 = [First Year in Selection]
+			VAR y1 = [Last Year in Selection]
+			VAR p0 = CALCULATE ( [Price per sqm], 'Date'[Year] = y0 )
+			VAR p1 = CALCULATE ( [Price per sqm], 'Date'[Year] = y1 )
+			VAR n = y1 - y0
+			RETURN IF ( n > 0 && p0 > 0 && p1 > 0, DIVIDE ( p1, p0 ) ^ ( 1 / n ) - 1 )
+		formatString: 0.0%
+		displayFolder: 4 Trends and index
+		lineageTag: e7288d30-05d3-52f8-b6e2-94e9d656f0dc
+
+	measure 'Average Price Change Since Start %' =
+			VAR y0 = [First Year in Selection]
+			VAR y1 = [Last Year in Selection]
+			VAR p0 = CALCULATE ( [Average Price], 'Date'[Year] = y0 )
+			VAR p1 = CALCULATE ( [Average Price], 'Date'[Year] = y1 )
+			RETURN IF ( y1 > y0 && p0 > 0 && p1 > 0, DIVIDE ( p1, p0 ) - 1 )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 4 Trends and index
+		lineageTag: c93cd404-f10e-5baf-9c8d-16fc3ba47876
+
+	/// TRUE for a year that is not fully covered by the data (missing months, or the final part-year).
+	measure 'Year Is Incomplete' =
+			VAR y = MAX ( 'Date'[Year] )
+			VAR laastDate = CALCULATE ( MAX ( 'Housing Data'[Sale Date] ), REMOVEFILTERS ( 'Housing Data' ) )
+			VAR expected = IF ( y = YEAR ( laastDate ), MONTH ( laastDate ), 12 )
+			VAR actual =
+			    COUNTROWS (
+			        FILTER (
+			            VALUES ( 'Date'[Month Start] ),
+			            CALCULATE ( COUNTROWS ( 'Housing Data' ), REMOVEFILTERS ( 'Housing Data' ) ) > 0
+			        )
+			    )
+			VAR partialLastYear = y = YEAR ( laastDate ) && laastDate < DATE ( y, 12, 31 )
+			RETURN actual < expected || partialLastYear
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		displayFolder: 4 Trends and index
+		lineageTag: 6599a468-17f3-5e02-83b4-5362d9d52a20
+
+	/// Light blue for incomplete years, blue otherwise.
+	measure 'Year Bar Color' = IF ( [Year Is Incomplete], "#9EC5F4", "#2A78D6" )
+		isHidden
+		displayFolder: 10 Formatting helpers
+		lineageTag: a2e6ece5-1d90-5805-a656-811e2c1b4d97
+
+	measure 'YoY Bar Color' = IF ( [Selected Metric YoY %] < 0, "#E34948", "#2A78D6" )
+		isHidden
+		displayFolder: 10 Formatting helpers
+		lineageTag: 3f909501-2b39-5419-81ac-e0e86d9c05df
+
+	measure 'Selected Metric Name' = SELECTEDVALUE ( 'Metric Selector'[Metric], "Sales Value" )
+		displayFolder: 5 Metric selector
+		lineageTag: 7152f73f-2bf0-5f9b-882a-d08d42c4e48f
+
+	measure 'Selected Metric' =
+			SWITCH (
+			    [Selected Metric Name],
+			    "Sales Value", [Total Sales Value],
+			    "Homes Sold", [Homes Sold],
+			    "Average Price", [Average Price],
+			    "Price per sqm", [Price per sqm],
+			    BLANK ()
+			)
+		formatString: #,0
+		displayFolder: 5 Metric selector
+		lineageTag: 5ce1c005-2d89-51a2-8c77-a3556af4c3ed
+
+	measure 'Selected Metric PY' =
+			SWITCH (
+			    [Selected Metric Name],
+			    "Sales Value", [Sales Value PY],
+			    "Homes Sold", [Homes Sold PY],
+			    "Average Price", [Average Price PY],
+			    "Price per sqm", [Price per sqm PY],
+			    BLANK ()
+			)
+		formatString: #,0
+		displayFolder: 5 Metric selector
+		lineageTag: 3b79de9c-8a8d-531c-b028-b17672a350b8
+
+	measure 'Selected Metric YoY %' = DIVIDE ( [Selected Metric] - [Selected Metric PY], [Selected Metric PY] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 5 Metric selector
+		lineageTag: 9198c9e4-f173-5250-b277-f2afc627343d
+
+	measure 'Selected Metric Title' = [Selected Metric Name] & " by year" & IF ( [Selected Metric Name] IN { "Sales Value", "Average Price", "Price per sqm" }, " (DKK)", "" )
+		displayFolder: 5 Metric selector
+		lineageTag: dafd3af0-31c7-5e18-8135-81d7df85db53
+
+	measure 'Selected Metric YoY Title' = [Selected Metric Name] & ": change vs prior year (%)"
+		displayFolder: 5 Metric selector
+		lineageTag: cf4b524a-210b-50fa-9b18-b1f9506550ec
+
+	/// Nominal interest rate: average of the quarterly values in context.
+	measure 'Interest Rate' = AVERAGEX ( VALUES ( 'Housing Data'[Quarter Key] ), CALCULATE ( MAX ( 'Housing Data'[Interest Rate] ) ) )
+		formatString: 0.00%
+		displayFolder: 6 Rates and drivers
+		lineageTag: 1de3fd6b-651f-5fe7-b5a4-9f7c0eee6d0b
+
+	measure 'Mortgage Bond Yield' = AVERAGEX ( VALUES ( 'Housing Data'[Quarter Key] ), CALCULATE ( MAX ( 'Housing Data'[Bond Yield] ) ) )
+		formatString: 0.00%
+		displayFolder: 6 Rates and drivers
+		lineageTag: bbd70795-aafc-5dff-af35-01cd54eed9ba
+
+	measure 'Inflation Rate' = AVERAGEX ( VALUES ( 'Housing Data'[Quarter Key] ), CALCULATE ( MAX ( 'Housing Data'[Inflation Rate] ) ) )
+		formatString: 0.00%
+		displayFolder: 6 Rates and drivers
+		lineageTag: 7ce748ef-3649-5fbc-84e9-8c050c801acf
+
+	/// Nominal interest rate minus inflation.
+	measure 'Real Interest Rate' = IF ( NOT ISBLANK ( [Interest Rate] ) && NOT ISBLANK ( [Inflation Rate] ), [Interest Rate] - [Inflation Rate] )
+		formatString: 0.00%
+		displayFolder: 6 Rates and drivers
+		lineageTag: 16634f73-c4a7-5800-aa12-79684ffe4c6d
+
+	/// Most recent quarterly value in the selection.
+	measure 'Interest Rate (Latest)' =
+			VAR laastDate = CALCULATE ( MAX ( 'Housing Data'[Sale Date] ), NOT ( ISBLANK ( 'Housing Data'[Interest Rate] ) ) )
+			RETURN CALCULATE ( MAX ( 'Housing Data'[Interest Rate] ), 'Housing Data'[Sale Date] = laastDate )
+		formatString: 0.00%
+		displayFolder: 6 Rates and drivers
+		lineageTag: aa91d77e-1d64-59a7-a944-3a78bc10f49d
+
+	measure 'Mortgage Bond Yield (Latest)' =
+			VAR laastDate = CALCULATE ( MAX ( 'Housing Data'[Sale Date] ), NOT ( ISBLANK ( 'Housing Data'[Bond Yield] ) ) )
+			RETURN CALCULATE ( MAX ( 'Housing Data'[Bond Yield] ), 'Housing Data'[Sale Date] = laastDate )
+		formatString: 0.00%
+		displayFolder: 6 Rates and drivers
+		lineageTag: 91e669b7-e839-5275-b9c7-a1e6b25260e9
+
+	measure 'Inflation Rate (Latest)' =
+			VAR LaastDate = CALCULATE ( MAX ( 'Housing Data'[Sale Date] ), NOT ( ISBLANK ( 'Housing Data'[Inflation Rate] ) ) )
+			RETURN CALCULATE ( MAX ( 'Housing Data'[Inflation Rate] ), 'Housing Data'[Sale Date] = LaastDate )
+		formatString: 0.00%
+		displayFolder: 6 Rates and drivers
+		lineageTag: 64aa9dbc-a5e1-5dab-b2f3-c432e3d7dcc7
+
+	measure 'Real Interest Rate (Latest)' =
+			VAR laastDate =
+			    CALCULATE (
+			        MAX ( 'Housing Data'[Sale Date] ),
+			        NOT ( ISBLANK ( 'Housing Data'[Interest Rate] ) ),
+			        NOT ( ISBLANK ( 'Housing Data'[Inflation Rate] ) )
+			    )
+			RETURN
+			    CALCULATE (
+			        MAX ( 'Housing Data'[Interest Rate] ) - MAX ( 'Housing Data'[Inflation Rate] ),
+			        'Housing Data'[Sale Date] = laastDate
+			    )
+		formatString: 0.00%
+		displayFolder: 6 Rates and drivers
+		lineageTag: c6bc0fc8-4350-5480-bf04-5a868641340f
+
+	measure 'Sold Below Offer %' = DIVIDE ( CALCULATE ( [Homes Sold], 'Housing Data'[Offer Outcome] = "Sold below offer" ), [Homes Sold] )
+		formatString: 0.0%
+		displayFolder: 7 Buyer behaviour
+		lineageTag: 43e4edde-2708-5183-9abe-115a19a10e59
+
+	measure 'Sold At Offer %' = DIVIDE ( CALCULATE ( [Homes Sold], 'Housing Data'[Offer Outcome] = "Sold at offer" ), [Homes Sold] )
+		formatString: 0.0%
+		displayFolder: 7 Buyer behaviour
+		lineageTag: af7aa21c-c923-5f63-ab16-ffd21669444f
+
+	measure 'Sold Above Offer %' = DIVIDE ( CALCULATE ( [Homes Sold], 'Housing Data'[Offer Outcome] = "Sold above offer" ), [Homes Sold] )
+		formatString: 0.0%
+		displayFolder: 7 Buyer behaviour
+		lineageTag: d4d9e7b9-b809-5e2c-a4d6-914a46abd2f8
+
+	/// Average % below the offer, counting only homes that sold below offer.
+	measure 'Average Discount When Below Offer' = CALCULATE ( [Average Offer vs Sale %], 'Housing Data'[Offer Outcome] = "Sold below offer" )
+		formatString: 0.0%
+		displayFolder: 7 Buyer behaviour
+		lineageTag: eeed4d54-3101-59b8-8baa-878fcd3c7e61
+
+	measure 'Auction Share' = DIVIDE ( CALCULATE ( [Homes Sold], 'Housing Data'[Sales Type] = "Auction" ), [Homes Sold] )
+		formatString: 0.0%
+		displayFolder: 7 Buyer behaviour
+		lineageTag: 2c1335be-ada3-5627-ab9a-d7f89a064a02
+
+	measure 'Sales Type Share' = DIVIDE ( [Homes Sold], CALCULATE ( [Homes Sold], ALLSELECTED ( 'Housing Data'[Sales Type] ) ) )
+		formatString: 0.0%
+		displayFolder: 7 Buyer behaviour
+		lineageTag: ca68b30a-88a3-5e62-92dc-ec98d8dc6c88
+
+	measure 'Share of Sales Value' = DIVIDE ( [Total Sales Value], CALCULATE ( [Total Sales Value], ALLSELECTED ( 'Housing Data' ) ) )
+		formatString: 0.0%
+		displayFolder: 8 Share and ranking
+		lineageTag: aaf21b92-a60e-5810-9017-6f39af42a0fb
+
+	measure 'Share of Homes Sold' = DIVIDE ( [Homes Sold], CALCULATE ( [Homes Sold], ALLSELECTED ( 'Housing Data' ) ) )
+		formatString: 0.0%
+		displayFolder: 8 Share and ranking
+		lineageTag: 6e295c47-e27b-5148-a412-9f27ae19624c
+
+	/// Minimum number of sales for a city to be ranked (slicer).
+	measure 'Min Sales Value' = SELECTEDVALUE ( 'Min Sales'[Min Sales], 40 )
+		formatString: 0
+		displayFolder: 8 Share and ranking
+		lineageTag: f61b07a3-b019-53f1-bde0-3c9ed1771390
+
+	/// How many cities to show in the ranking (slicer).
+	measure 'Top N Value' = SELECTEDVALUE ( 'Top N'[Top N], 10 )
+		formatString: 0
+		displayFolder: 8 Share and ranking
+		lineageTag: 47dde09a-0643-504c-9f3d-d417c3236026
+
+	/// Rank of a city by price per sqm among cities with enough sales; direction set by the Rank Mode slicer.
+	measure 'City Rank' = ```
+			
+			VAR minSales = [Min Sales Value]
+			VAR rankMode =
+			    SELECTEDVALUE ( 'Rank Mode'[Mode], "Highest" )
+			VAR eligible =
+			    FILTER (
+			        ALLSELECTED ( 'Housing Data'[City] ),
+			        [Homes Sold] >= minSales
+			    )
+			RETURN
+			    IF (
+			        [Homes Sold] >= minSales,
+			        IF (
+			            rankMode = "Highest",
+			            RANKX ( eligible, [Price per sqm], , DESC, DENSE ),
+			            RANKX ( eligible, [Price per sqm], , ASC, DENSE )
+			        )
+			    )
+			
+			```
+		formatString: 0
+		displayFolder: 8 Share and ranking
+		lineageTag: 8c724445-61c2-5b05-8561-cb0dc76df90b
+
+	measure 'City Rank Shown' = VAR r = [City Rank] RETURN IF ( NOT ISBLANK ( r ) && r <= [Top N Value], r )
+		formatString: 0
+		displayFolder: 8 Share and ranking
+		lineageTag: 3661ae3b-8c02-59e3-898e-4a1d5c6c56b8
+
+	measure 'Ranked City Price per sqm' = IF ( NOT ISBLANK ( [City Rank Shown] ), [Price per sqm] )
+		formatString: #,0
+		displayFolder: 8 Share and ranking
+		lineageTag: 3a908af8-a9c9-5cd2-b80d-e7b01368ca30
+
+	measure 'Top Area by Value' = CONCATENATEX ( TOPN ( 1, ALLSELECTED ( 'Housing Data'[Area] ), [Total Sales Value], DESC ), 'Housing Data'[Area], ", " )
+		displayFolder: 9 Narrative and labels
+		lineageTag: 4c92fd52-2601-5841-b20b-63e17798018b
+
+	measure 'Top Area Share of Value' =
+			VAR topArea = TOPN ( 1, ALLSELECTED ( 'Housing Data'[Area] ), [Total Sales Value], DESC )
+			VAR topValue = MAXX ( topArea, [Total Sales Value] )
+			RETURN DIVIDE ( topValue, CALCULATE ( [Total Sales Value], ALLSELECTED ( 'Housing Data' ) ) )
+		formatString: 0.0%
+		displayFolder: 9 Narrative and labels
+		lineageTag: 623102c8-b200-5052-ade3-5fb6eda7b48a
+
+	measure 'Priciest Area (per sqm)' = CONCATENATEX ( TOPN ( 1, ALLSELECTED ( 'Housing Data'[Area] ), [Price per sqm], DESC ), 'Housing Data'[Area], ", " )
+		displayFolder: 9 Narrative and labels
+		lineageTag: c3bd8d0a-451a-5084-962b-dde430b6063f
+
+	/// Plain-English summary line 1 (updates with filters).
+	measure 'Insight 1' =
+			VAR n = [Homes Sold]
+			VAR fy = [First Year in Selection]
+			VAR ly = [Last Year in Selection]
+			VAR pFirst = CALCULATE ( [Price per sqm], 'Date'[Year] = fy )
+			VAR pLast = CALCULATE ( [Price per sqm], 'Date'[Year] = ly )
+			VAR hYoY = [Homes Sold YoY % (Latest Yr)]
+			VAR aYoY = [Average Price YoY % (Latest Yr)]
+			RETURN
+			    IF (
+			        n = 0,
+			        "No sales match the current filters.",
+			        "Sales value totals DKK " & FORMAT ( [Total Sales Value] / 1000000000, "#,0.0" ) & "bn across "
+			            & FORMAT ( n, "#,0" ) & " homes. The average home sold for DKK "
+			            & FORMAT ( [Average Price] / 1000000, "0.00" ) & "m and the median for DKK "
+			            & FORMAT ( [Median Price] / 1000000, "0.00" ) & "m."
+			    )
+		displayFolder: 9 Narrative and labels
+		lineageTag: 58255c00-24e0-5d58-b372-8971207140a9
+
+	/// Plain-English summary line 2.
+	measure 'Insight 2' =
+			VAR n = [Homes Sold]
+			VAR fy = [First Year in Selection]
+			VAR ly = [Last Year in Selection]
+			VAR pFirst = CALCULATE ( [Price per sqm], 'Date'[Year] = fy )
+			VAR pLast = CALCULATE ( [Price per sqm], 'Date'[Year] = ly )
+			VAR hYoY = [Homes Sold YoY % (Latest Yr)]
+			VAR aYoY = [Average Price YoY % (Latest Yr)]
+			RETURN
+			    IF (
+			        n = 0,
+			        BLANK (),
+			        IF (
+			            ly > fy && pFirst > 0 && pLast > 0,
+			            "Price per sqm " & IF ( pLast >= pFirst, "rose", "fell" ) & " from DKK " & FORMAT ( pFirst, "#,0" )
+			                & " in " & fy & " to DKK " & FORMAT ( pLast, "#,0" ) & " in " & ly
+			                & ", about " & FORMAT ( [Price per sqm CAGR], "0.0%" ) & " a year.",
+			            "Select a range of at least two years to see the long-run price trend."
+			        )
+			    )
+		displayFolder: 9 Narrative and labels
+		lineageTag: c84755a6-ead0-5afb-bb01-36c559574d51
+
+	/// Plain-English summary line 3.
+	measure 'Insight 3' =
+			VAR n = [Homes Sold]
+			VAR fy = [First Year in Selection]
+			VAR ly = [Last Year in Selection]
+			VAR pFirst = CALCULATE ( [Price per sqm], 'Date'[Year] = fy )
+			VAR pLast = CALCULATE ( [Price per sqm], 'Date'[Year] = ly )
+			VAR hYoY = [Homes Sold YoY % (Latest Yr)]
+			VAR aYoY = [Average Price YoY % (Latest Yr)]
+			RETURN
+			    IF (
+			        n = 0,
+			        BLANK (),
+			        IF (
+			            ISBLANK ( hYoY ) || ISBLANK ( aYoY ),
+			            "There is no prior year to compare with in this selection.",
+			            "In " & ly & ", homes sold were " & IF ( hYoY >= 0, "up ", "down " ) & FORMAT ( ABS ( hYoY ), "0.0%" )
+			                & " and the average price " & IF ( aYoY >= 0, "up ", "down " ) & FORMAT ( ABS ( aYoY ), "0.0%" )
+			                & " on the same period a year earlier."
+			        )
+			    )
+		displayFolder: 9 Narrative and labels
+		lineageTag: 8301a04d-b7c3-5200-9075-69fb9d99fa86
+
+	/// Plain-English summary line 4.
+	measure 'Insight 4' =
+			IF (
+			    [Homes Sold] = 0,
+			    BLANK (),
+			    [Top Area by Value] & " is the largest market with " & FORMAT ( [Top Area Share of Value], "0%" )
+			        & " of sales value; " & [Priciest Area (per sqm)] & " has the highest price per sqm."
+			)
+		displayFolder: 9 Narrative and labels
+		lineageTag: 2ac8da84-3a9b-5316-864b-92fd09a7f78f
+
+	measure 'Footer Note' =
+			VAR firstDatee = CALCULATE ( MIN ( 'Housing Data'[Sale Date] ), REMOVEFILTERS ( 'Housing Data' ) )
+			VAR laastDate = CALCULATE ( MAX ( 'Housing Data'[Sale Date] ), REMOVEFILTERS ( 'Housing Data' ) )
+			VAR total = CALCULATE ( COUNTROWS ( 'Housing Data' ), REMOVEFILTERS ( 'Housing Data' ) )
+			RETURN
+			    "Source: Housing Data.csv  |  " & FORMAT ( total, "#,0" ) & " sales from " & FORMAT ( firstDatee, "d mmm yyyy", "en-US" )
+			        & " to " & FORMAT ( laastDate, "d mmm yyyy", "en-US" ) & "  |  Amounts in DKK  |  No sales are recorded for Dec 2016 to Jun 2017"
+		displayFolder: 9 Narrative and labels
+		lineageTag: fb2aed93-9465-5ca0-9556-c2fae8726e7d
+
+	column Value
+		dataType: int64
+		isHidden
+		lineageTag: 47554f17-44a1-5510-9a5e-b5140c095eef
+		isNameInferred
+		sourceColumn: [Value]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = calculated
+		mode: import
+		source = {1}
+
