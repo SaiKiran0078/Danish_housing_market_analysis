@@ -9,7 +9,7 @@
 ![Power BI](https://img.shields.io/badge/Power%20BI-Report-F2C811?logo=powerbi&logoColor=black)
 ![Power Query](https://img.shields.io/badge/Power%20Query-M-217346)
 ![Python](https://img.shields.io/badge/Python-pandas-3776AB?logo=python&logoColor=white)
-![SQL](https://img.shields.io/badge/SQL-SQLite-4479A1?logo=sqlite&logoColor=white)
+![SQL](https://img.shields.io/badge/SQL-SQL%20Server-CC2927?logo=microsoftsqlserver&logoColor=white)
 ![DAX](https://img.shields.io/badge/Analytics-DAX-4C78A8)
 ![Sample](https://img.shields.io/badge/Sample-100%2C000%20rows-2878C8)
 ![Period](https://img.shields.io/badge/Period-1992--2024-12345A)
@@ -122,7 +122,7 @@ The report contains five pages with shared filters for year range, region, area,
 | **Power Query (M)** | Importing and shaping the CSV data |
 | **DAX** | Measures, calculated tables, time-based comparisons, KPI logic and rankings |
 | **Python (pandas)** | Data-quality checks and summary tables to cross-check report findings |
-| **SQL (SQLite-compatible)** | Queries for KPIs, annual trends, region/type comparisons, asking-price outcomes and missing macroeconomic data |
+| **SQL Server (SSMS)** | Data-quality checks, market KPIs, annual growth, regional/city and property-type comparisons, offer-price differences and macroeconomic trends |
 | **CSV** | Source transaction data, downloaded separately |
 | **Git / GitHub** | Version control and project documentation |
 
@@ -153,8 +153,10 @@ Danish_housing_market_analysis/
 │   └── Housing Market Report.pdf
 ├── analysis/
 │   ├── README.md
-│   ├── analyze_housing.py
-│   └── housing_analysis.sql
+│   ├── python/
+│   │   └── analyze_housing.py
+│   └── sql/
+│       └── housing_analysis.sql
 ├── powerbi_reference/
 │   ├── 1_PowerQuery_Housing_Data.m
 │   ├── 2_Calculated_Tables.dax
@@ -164,7 +166,7 @@ Danish_housing_market_analysis/
 └── README.md
 ```
 
-This is a guide to the intended layout. Refer to the actual files in the repository if any filenames differ.
+The `data/` folder is intentionally local-only and is not tracked by Git; create it yourself and put the downloaded CSV there when running the report or analysis scripts.
 
 ## 🚀 Open the report
 
@@ -177,12 +179,12 @@ This is a guide to the intended layout. Refer to the actual files in the reposit
 
 1. Clone or download this repository and extract it.
 2. Download the 100,000-row sample from the dataset source, checking the source's current terms.
-3. Keep the CSV in a local folder you control. It does not need to be committed to GitHub.
+3. In the repository root, create a local `data` folder and place the downloaded file there as `Housing Data.csv`. The dataset file is ignored by Git and will not be uploaded.
 4. Open `Housing Market Report.pbip` in Power BI Desktop.
-5. If Power BI reports that the CSV cannot be found, open **Home → Transform data → Edit parameters** and set `CsvPath` to the full path of your downloaded CSV. For example:
+5. If Power BI reports that the CSV cannot be found, open **Home → Transform data → Edit parameters** and set `CsvPath` to the full path of `data\Housing Data.csv`. For example:
 
    ```text
-   C:\Users\YourName\Downloads\Housing Data.csv
+   C:\path\to\Danish_housing_market_analysis\data\Housing Data.csv
    ```
 
 6. Confirm the parameter, select **Close & Apply**, and allow the model to refresh.
@@ -196,32 +198,37 @@ The repository includes a small analysis layer to support and cross-check the Po
 
 ### Python (pandas)
 
-The Python script is located at [`analysis/analyze_housing.py`](analysis/analyze_housing.py). It is intended to check dataset coverage and missing values, calculate overall market KPIs, create annual trends, compare regions and property types, and summarise sale outcomes against asking prices.
+The script [`analysis/python/analyze_housing.py`](analysis/python/analyze_housing.py) reads `data/Housing Data.csv` from the repository root. It validates expected columns and writes summary CSVs to `analysis/outputs/`:
 
-Run from the repository root after placing the CSV at the path expected by the script:
+- `data_quality_summary.csv`
+- `market_kpis.csv`
+- `annual_market_trends.csv`
+- `regional_comparison.csv`
+- `property_type_comparison.csv`
+- `asking_price_outcomes.csv` (when the offer-change column is available)
+
+Run these commands from the repository root after placing the CSV in the local `data/` folder:
 
 ```bash
 python -m pip install pandas
-python analysis/analyze_housing.py
+python analysis/python/analyze_housing.py
 ```
 
-If the script expects a different CSV path, update its configuration to point to your downloaded file. Output files, if generated, depend on the script's implementation.
+The output directory is created automatically. Generated output CSVs are ignored by Git.
 
-### SQL (SQLite-compatible)
+### SQL Server (SSMS)
 
-The SQL file is located at [`analysis/housing_analysis.sql`](analysis/housing_analysis.sql). It contains focused queries for data quality, market KPIs, annual trends, regional comparisons, house types, asking-price outcomes and missing interest-rate/inflation fields. The queries expect the CSV to be imported into a SQLite table named `housing_data`, with the original column names preserved.
+The query file is [`analysis/sql/housing_analysis.sql`](analysis/sql/housing_analysis.sql). It is written for Microsoft SQL Server, not SQLite. It covers schema and data-quality checks, market KPIs, annual trends and year-over-year changes, regional and city performance, property types and sales channels, offer-to-purchase differences, and macroeconomic indicators.
 
-For example, using the SQLite command-line shell, first place the downloaded CSV at `data/Housing Data.csv` locally (the `data/` folder is not included in the repository), then run:
+To run it:
 
-```sql
-.mode csv
-.import --skip 1 "data/Housing Data.csv" housing_data
-.read analysis/housing_analysis.sql
-```
+1. Open SQL Server Management Studio (SSMS) and connect to your SQL Server instance.
+2. Create or select the `HOUSINGDB` database.
+3. Import the local `data/Housing Data.csv` into `HOUSINGDB` as `dbo.[Housing Data]`, using the first CSV row as column headers.
+4. Verify the imported schema. The script expects columns such as `purchase_price`, `sqm_price`, `house_type`, `sales_type`, `region`, `city`, `quarter`, and `change_between_offer_and_purchase`.
+5. Open `analysis/sql/housing_analysis.sql` in SSMS and execute the full script. Review the result grids and Messages tab.
 
-If your SQLite version does not support `--skip 1`, create the table and import through a SQLite GUI such as DB Browser for SQLite, enabling the option to use the first CSV row as column names. Because the source includes punctuation in some column names, keep the original headers unchanged.
-
-**Interpretation:** treat year-over-year changes around the December 2016–June 2017 data gap carefully, and interpret 2024 as a partial year through 24 October. The scripts do not establish causal relationships.
+The script uses SQL Server features such as `TRY_CONVERT`, `OBJECT_ID`, `GO`, and the `#Housing` temporary table. Annual comparisons around the December 2016–June 2017 data gap may be distorted; 2024 is partial through 24 October. These queries describe associations and trends, not causation.
 
 > **PBIP or PBIX?** This repository keeps PBIP as the main project because its report and model definitions are easier to track in Git. A PBIX is optional; it is not required to use this repository.
 
@@ -241,9 +248,9 @@ The CSV is intentionally excluded from this public repository because redistribu
 
 ## 🔍 Reproducibility checklist
 
-- [ ] Download the appropriate 100,000-row sample from the source.
+- [ ] Download the appropriate 100,000-row sample from the source and place it at `data/Housing Data.csv` locally.
 - [ ] Open `Housing Market Report.pbip` in Power BI Desktop.
-- [ ] Set `CsvPath` to the local CSV path if prompted.
+- [ ] Set `CsvPath` to the local `data/Housing Data.csv` path if prompted.
 - [ ] Refresh the model and check for errors.
 - [ ] Verify all five pages and check for blank visuals.
 - [ ] Review key measures and time comparisons.
